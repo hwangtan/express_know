@@ -1,3 +1,11 @@
+##기초
+
+익스프레스는 애플리케이션, 요청, 응답 3개의 큰 객체로 이루어져있다.
+
+각 객체가 가진 레퍼런스가 궁금하다면 https://expressjs.com/en/4x/api.html#express.static
+
+참조하기 바란다.
+
 
 
 ##앱 만들기
@@ -25,8 +33,72 @@ app.set('views', './views');
  - html 템플릿을 뷰엔진으로 정의하는것은 별도의 작업이 필요하다.
 
 정적폴더 정의
-
 app.use(express.static('./public'));
+
+많이 사용되는 미들웨어 소개
+미들웨어명 | 설명
+-----------|-----------
+router| 라우팅 시스템
+logger| 서버에 전달되는 요청 기록
+compress| gzip/deflate 압축 포맷
+basicAuth| 기본 HTTP 인증
+json| application/json 타입의 데이터를 파싱
+urlencoded| application/x-www-form-urlencoded 타입의 데이터를 파싱
+multipart| multipart/form-data 타입의 데이터를 파싱
+bodyParser| 요청 바디를 파싱 json, urlencoded, multipart/form-data 와함께 그룹핑
+timeout|  타임아웃 요청
+cookieParser| 쿠키파싱
+session| 세션지원
+cookieSession| 쿠키기반의 세션
+methodOverride| HTTP함수(GET, POST, PUT) 지원
+responseTime| 서버 응답시간 표시
+static| 웹 사이트에서 사용되는 정적 assets 폴더를 설정
+staticCache| 정적 미들웨어를 위한 캐시
+directory| 폴더 목록화
+vhost| vhost 활성화
+favicon| 웹사이트가 사용하는 파비콘
+limit| 요청 바디크기의 제한
+query| GET 쿼리 파셔
+errorHandler| 서버에서 발생한 에러를 html 형태의 스택 트레이스 생성
+
+**logger 소개**
+사용법은 간단하다 
+> app.use(express.logger(options));
+
+format 객체를 통해 세부 옵션을 설정할수있다.
+토큰|설명
+----|-----
+:req[header] |요청의 특정헤더
+:res[header] |응답의 특정헤더
+:http-version |http version
+:response-time |응답 생성에 걸리는 시간
+:remote-addr |클라이언트 브라우저의 IP주소
+:date| 요청이 발생한 시간과 날짜
+:method |요청을 만드는데 호출한 함수
+:url |클라이언트가 요청한 URL
+:referrer |이전에 사용한 url
+:user-agent| 유저 에이전트 서명
+:status | HTTP상태 코드
+
+사용은 이렇게 하면된다
+>app.use(express.logger({ format: ':method :url :referrer :status' }))
+
+**개발 환경**
+익스프레스 서버가 가동되면 app.get('env') 를통해 서버 환경에대해서 체크한다.
+이 함수가 실행되는 원리는 process.env 객체에 포함된 NODE_ENV 라는 환경 변수를 찾아
+NODE_ENV 에 env 를 할당하고 찾지못하면 development로 할당한다.
+NODE_ENV 는 app.set() 을 통해 값을 설정하고 app.get() 을 통해 값을 획득한다.
+이를 통해 개발 환경별로 미들웨어 사용이나 로직등을 달리 할수있다
+if('production' == app.get('env')) {
+    
+}
+if('development' == app.get('env')) {
+    
+}
+
+
+
+
 
 ## 익스프레스 라우트의 이해
 
@@ -301,3 +373,109 @@ router.post('/signup',multipartMiddleware,function(req, res) {
 });
 ```
 
+이제 파일 업로드 코드를 추가 해보자
+```javascript
+    var target_path = __dirname + '/../public/images/'+ req.files.image.originalFilename;
+    var temp_path   = req.files.image.path;
+    fs.readFile(temp_path, function(err, data) {
+        fs.writeFile(target_path, data, function(err) {
+            res.redirect('/');
+        });
+    });
+```
+
+target_path 에 주목할 필요가 있는데 __dirname은 현재파일이 위치한 경로를 보여준다.
+그런데 문제가 있다. 이코드는 routes/index.js 에 정의되어있기때문에 public/images/에
+저장하기 위해선 __dirname에 상위 경로를 찾아가야한다. 다음과같이 경로를 추가해준다.
+`/..public/images/`
+
+기존에 GET방식에서 쿼리문자열은 가독성이 떨어진다
+http://localhost:3333/user?id=89&password=1234
+이방식을 http://localhost:3333/user/89/1234 이렇게 변환할수도 있다.
+app.get 에서 라우터명에 쿼리명을 미리 지정하는것인데
+app.get('/user/:id/:password', callback) 이런방식으로 지정하면 된다.
+
+req.param() 은 req.params req.body req.query 순서로 값을 읽는데 이는 값이 정의된 위치에
+따라 읽어 들이는 값이 달라진다 따라서 찾기 난해한 버그를 유발한다.
+
+꼭필요하지 않는 이상 사용을 권장하지 않는다.
+
+**쿠키 사용**
+app.use(express.cookieParser()); router 미들웨어보다 먼저 선언되어야 하며
+res.cookie() 를 통해 설정 가능하다.
+
+쿠키 쓰기
+res.cookie('name','hello');
+쿠키 읽기
+req.cookies.name;
+
+쿠키 업데이트 (덮어쓰기)  
+res.cookie('name',new_value)
+
+서명있는 쿠키
+쿠키값에 서명을 포함시켜서 조금더 안전하다. 서명이 있는 쿠키를 손코딩으로
+수정하면 이를 감지하고 수정된 쿠키를 무효화 시킨다.
+app.use(express.cookieParser('signed123QWE'));
+쿠키파서 파라미터안에 서명할 문자열을 적는다.
+이렇게 되면 쿠키를 읽어올때 req.cookies 에선 찾을수없고
+req.signedCookies.name 에서 값을 찾아야된다.
+
+쿠키삭제
+res.clearCookie(); 설정하는 날짜에 도달하면 삭제시킬수있고 정확한 도메인 이름과
+경로 옵션을 사용하지 않으면 쿠키는 삭제되지않는다.
+
+생성|삭제
+----|----
+res.cookie('name','hwang') | res.clearCookie('name')
+res.cookie('name','hwang',{path: '/name'}) | res.clearCookie('name',{path:'/name'})
+res.cookie('name','hwang',{sign: true}) | res.clearCookie('name')
+
+쿠키세션
+쿠키파서에 서명을 하고 그 밑에 쿠키세션을 선언한다
+app.use(express.cookieParser('QWE123AZ'));
+app.use(express.cookieSession())
+쿠키세션은 4가지 옵션이 이 있는데 key, secret, cookie, proxy 를 설정할수 있다.
+
+세션 스토어 기반 세션
+세션 스토어는 백엔드에서 세션 데이터르 ㄹ저장하는 기법이며 세션 스토어 기반 세션은
+사용자가 볼수 없는 커다란 양의 데이터를 저장할수 있다.
+session 미들웨어는 cookieParser 미들웨어가 꼭필요하다 
+app.use(express.cookieParser('QWER4234'));
+app.use(express.session());
+session 에 설정할수있는 옵션은 쿠키세션이 가진 4가지 옵션과 동일하고
+추가적으로 store 를 지정할수있다.기본값은 메모리 스토어 이며 가장 많이 사용하는 
+3가지 스토어에 대해서 설명하겠다.
+
+메모리 스토어 : 내장형,기본값, RAM사용, DB사용필요없음, 세션이 증가할때 마다
+메모리 소비가 지속적으로 증가함, 앱이 재실행될때 모든 세션 데이터 유실,
+세션 데이터는 하나의 클러스터 내에 있는 앱의 다른 인스턴스들과 공유할수 없음.
+
+레디스 스토어 :  connect-redis 모듈을 설치한다
+var express = require('express');
+var RedisStore = require('connect-redis')(express)
+app.use(express.session({ store: new RedisStore({
+    host:'127.0.0.1',
+    port: 6666,
+    prefix: 'sess'
+}), secret:'ASDF12QZ'}))
+
+몽고 스토어 : 레디스 스토어와 셋팅법은 같다. connect-mongo 사용
+
+세션 설정과 읽기 업데이트역시 매우 간단하다
+설정 : req.session.name = 'hwang'
+읽기 : req.session.name
+업데이트 : req.session.name = 'tan';
+세션 변수 삭제는 req.session.name = undefined 또는 null 로 하지 않는다.
+delete req.session.name; 으로 삭제한다.
+세션 스토어 기반 세션을 삭제하는 방법으로 destory 를 제공하는데
+req.session.destory() 로 호출하면 된다.-cookieSession 미들웨어는 destory 함수를 제공하지
+않는다.
+
+## 프로덕션 환경
+ 메모리에 템플릿 캐싱 , css 전처리기 캐싱 , 메모리 크기 제한 , 에러 메서지 간결
+ 벤치마킹은 siege 로 한다.
+ 가동시간 보장 forever 라는 노드 패키지 사용.
+ --내용 불충분
+ 리버스 프록시
+ 클러스터 처리
+ 예외처리 - 

@@ -31,11 +31,13 @@ router.post('/signup', multipartMiddleware, function(req, res, next) {
     var nickname = req.body.nickname;
     var message  = req.body.message;
     messages.push({nick:nickname, message: message});
-    console.log(req.files.image);
+    console.log(process.argv[1]);
+    console.log(__dirname)
     /*req.files.image in objects
         fieldName, originalFilename, path, headers, size, name, type
     */
-    var target_path ='../images/' + req.files.image.originalFilename;
+    /*^ extra slash*/
+    var target_path = __dirname + '/../public/images/'+ req.files.image.originalFilename;
     var temp_path   = req.files.image.path;
     fs.readFile(temp_path, function(err, data) {
         fs.writeFile(target_path, data, function(err) {
