@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Welcome playground</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
+</head>
+<body>
+  <h2 style="border: 1px solid #ccc; background:#cccccc">GET</h2>
+  <form method='get' action='/change' class='form-inline'>
+  <div class='form-group'>
+    <label for='firstname'>first</label>
+    <input type='text'
+           class='form-control'
+           name='first name'
+           id='firstname'
+           placeholder="your first name" />
+  </div>
+  <div class='form-group'>
+    <label for='lastname'>last</label>
+    <input type='text'
+           class='form-control'
+           name='lastname'
+           id='lastname'
+           placeholder="your last name" />
+  </div>
+  <div class='checkbox'>
+    <label><input type='checkbox' name='checking' value='ch1'>ch1</label>
+    <label><input type='checkbox' name='checking' value='ch2'>ch2</label>
+    <label><input type='checkbox' name='checking' value='ch3'>ch3</label>
+    <label><input type='checkbox' name='checking' value='ch4'>ch4</label>
+  </div>
+    <button type='submit' class='btn btn-primary'>Change</button>
+  </form>
+  <h2>Your Name is <strong><%- first %> <%- last %></strong> Your checked <%- check %></h2>
+
+
+  <h2 style="border: 1px solid #ccc; background:#cccccc">POST</h2>
+  <form method='post' action='/signup' class='form-inline' enctype="multipart/form-data">
+    <div class='form-group'>
+        <label for='nickname'>nickname</label>
+        <input type='text'
+               class='form-control'
+               name='nickname'
+               id='nickname'
+               placeholder="your nickname" />
+    </div>
+    <div class='form-group'>
+        <label for='message'>message</label>
+        <input type='text'
+               class='form-control'
+               name='message'
+               id='message'
+               placeholder="type to message" />
+    </div>
+    <input type='file' name='image' />
+    <button type='submit' class='btn btn-success'>Submit</button>
+  </form>
+  <ul>
+  <% for (var i = 0; i < messages.length; i++) { %>
+        <li><%- messages[i].nick %> | <%- messages[i].message %></li>
+  <% } %>
+  </ul>
+</body>
+</html>
