@@ -1,0 +1,54 @@
+<div class="panel panel-default">
+  <div class="panel-heading"><h1>One Line Reply</h1></div>
+  <div class="panel-body well well-lg">
+    <form method='post' action='/reply' class='form-horizontal' >
+    <div class='form-group'>
+        <label for='nickname'>Nickname</label>
+        <input type='text'
+               class='form-control'
+               name='nickname'
+               id='nickname'
+               placeholder="your nickname" />
+    </div>
+    <div class='form-group'>
+        <label for='message'>Message</label>
+        <input type='text'
+               class='form-control'
+               name='message'
+               id='message'
+               placeholder="type to message" />
+    </div>
+    <div class='form-group'>
+      <button type='submit' class='btn btn-success'>Enter</button>
+    </div>
+  </form>
+  </div>
+  <table class='table table-striped'>
+    <thead>
+      <tr>
+        <th>Author</th>
+        <th>Contents</th>
+      </tr>
+    </thead>
+    <tbody>
+    <%  if (messages.length === 1) {%>
+      <tr>
+        <td colspan='2'>No Data</td><td></td>
+      </tr>
+    <% } else { %>
+        <% for (var i = 0; i < messages.length; i++) { %>
+            <tr>
+              <td><%- messages[i].nickname %></td>
+              <td><%- messages[i].message %></td>
+            </tr>
+        <% } %>
+    <% } %>
+    </tbody>
+  </table>
+</div>
+
+
+
+
+
+

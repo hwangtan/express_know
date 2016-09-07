@@ -1,3 +1,4 @@
+var bootstrapService = require("express-bootstrap-service");
 var express = require('express');
 var path = require('path');
 var favicon = require('serve-favicon');
@@ -6,6 +7,7 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var fs = require('fs');
 var routes = require('./routes/index');
+
 
 var app = express();
 
@@ -19,7 +21,7 @@ var exists = fs.existsSync(upload_dir);
 if (!exists) {
   fs.mkdirSync(upload_dir);
 }
-
+app.use(bootstrapService.serve);
 // uncomment after placing your favicon in /public
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 app.use(logger('dev'));

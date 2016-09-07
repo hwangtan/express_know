@@ -1,0 +1,39 @@
+<div class="panel panel-default">
+  <div class="panel-heading"><h1>Full Name And Fruit</h1></div>
+  <div class="panel-body well well-lg">
+    <form method='get' action='/change' class='form-horizontal'>
+      <div class='form-group'>
+        <label for='firstname'>First Name</label>
+        <input type='text'
+               class='form-control'
+               name='first name'
+               id='firstname'
+               placeholder="your first name" />
+      </div>
+      <div class='form-group'>
+        <label for='lastname'>Last Name</label>
+        <input type='text'
+               class='form-control'
+               name='lastname'
+               id='lastname'
+               placeholder="your last name" />
+      </div>
+      <div class='form-group'>
+        <label for='fruit'>My Favorite Fruit</label>
+        <div class='checkbox'>
+          <label><input type='checkbox' name='checking' value='apple'>apple</label>
+          <label><input type='checkbox' name='checking' value='mango'>mango</label>
+          <label><input type='checkbox' name='checking' value='kiwi'>kiwi</label>
+          <label><input type='checkbox' name='checking' value='grape'>grape</label>
+        </div>
+      </div>
+      <div class='form-group'>
+        <button type='submit' class='btn btn-primary'>Change</button>
+      </div>
+    </form>
+  </div>
+  <h3>Full Name :<strong><%- firstname +' '+lastname%></strong></h3>
+  <h3>Choose fruit(s) :<strong><%- check %></strong></h3>
+</div>
+
+
